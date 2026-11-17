@@ -1,69 +1,764 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ODI Auction Arena</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #101827;
-      color: white;
-      text-align: center;
-    }
-    header {
-      background: #087f5b;
-      padding: 25px;
-    }
-    .container {
-      padding: 25px;
-    }
-    .card {
-      background: #1e293b;
-      padding: 22px;
-      margin: 20px auto;
-      border-radius: 12px;
-      max-width: 450px;
-    }
-    input, button {
-      padding: 12px;
-      margin: 8px;
-      border-radius: 7px;
-      border: none;
-    }
-    button {
-      background: #16a34a;
-      color: white;
-      font-weight: bold;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>ODI Auction Arena</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #101827;
+  color: white;
+}
+
+header {
+  background: #087f5b;
+  padding: 30px 15px;
+  text-align: center;
+}
+
+header h1 {
+  font-size: 38px;
+  margin: 0 0 12px;
+}
+
+header p {
+  font-size: 20px;
+  margin: 0;
+}
+
+.container {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+}
+
+.card {
+  background: #1e293b;
+  padding: 25px;
+  margin: 20px 0;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.25);
+}
+
+h2 {
+  margin-top: 0;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 14px;
+  margin: 8px 0;
+  border: 0;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+button {
+  padding: 13px 20px;
+  margin: 6px;
+  border: 0;
+  border-radius: 8px;
+  background: #16a34a;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.85;
+}
+
+button:disabled {
+  background: #64748b;
+  cursor: not-allowed;
+}
+
+.danger {
+  background: #dc2626;
+}
+
+.blue {
+  background: #2563eb;
+}
+
+.orange {
+  background: #ea580c;
+}
+
+.player {
+  text-align: center;
+}
+
+.player-name {
+  font-size: 32px;
+  font-weight: bold;
+  margin: 15px 0;
+}
+
+.role {
+  color: #cbd5e1;
+  font-size: 18px;
+}
+
+.price {
+  font-size: 26px;
+  color: #22c55e;
+  margin: 15px;
+}
+
+.current-bid {
+  font-size: 30px;
+  font-weight: bold;
+  color: #facc15;
+}
+
+.status {
+  font-size: 22px;
+  font-weight: bold;
+  margin: 15px;
+}
+
+.sold {
+  color: #22c55e;
+}
+
+.unsold {
+  color: #ef4444;
+}
+
+.teams {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.team {
+  background: #334155;
+  padding: 15px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.team-name {
+  font-size: 19px;
+  font-weight: bold;
+}
+
+.purse {
+  color: #facc15;
+  margin-top: 8px;
+}
+
+.bid-info {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.hidden {
+  display: none;
+}
+
+.message {
+  text-align: center;
+  font-size: 18px;
+  color: #93c5fd;
+  min-height: 25px;
+}
+
+.small {
+  color: #94a3b8;
+  font-size: 14px;
+  text-align: center;
+}
+</style>
 </head>
+
 <body>
-  <header>
-    <h1>🏏 ODI AUCTION ARENA</h1>
-    <p>Multiplayer Cricket Auction</p>
-  </header>
-  <div class="container">
-    <div class="card">
-      <h2>Create Your Team</h2>
-      <input id="team" placeholder="Enter team name">
-      <button onclick="createTeam()">Create Team</button>
-      <p id="message"></p>
+
+<header>
+  <h1>🏏 ODI AUCTION ARENA</h1>
+  <p>Multiplayer Cricket Auction</p>
+</header>
+
+<div class="container">
+
+<!-- TEAM SETUP -->
+<div class="card" id="setupCard">
+
+  <h2>👥 Create Your Team</h2>
+
+  <input
+    id="teamName"
+    type="text"
+    placeholder="Enter team name"
+  >
+
+  <button onclick="createTeam()">
+    Create Team
+  </button>
+
+  <div id="teamMessage" class="message"></div>
+
+  <h3>Teams</h3>
+
+  <div id="teamList" class="teams"></div>
+
+</div>
+
+
+<!-- AUCTION -->
+<div class="card hidden" id="auctionCard">
+
+  <div class="player">
+
+    <div class="role" id="playerRole">
+      Player
     </div>
-    <div class="card">
-      <h2>Welcome to the Auction!</h2>
-      <p>Build your dream ODI cricket team.</p>
-      <p>More auction features coming next.</p>
+
+    <div class="player-name" id="playerName">
+      Virat Kohli
     </div>
+
+    <div class="price">
+      Base Price: ₹<span id="basePrice">2</span> Cr
+    </div>
+
+    <div class="bid-info">
+
+      <div>
+        Current Bid
+      </div>
+
+      <div class="current-bid">
+        ₹<span id="currentBid">2</span> Cr
+      </div>
+
+      <div>
+        Highest Bidder:
+        <strong id="highestBidder">No team</strong>
+      </div>
+
+    </div>
+
+    <button class="blue" onclick="placeBid()">
+      🔨 Place Bid
+    </button>
+
+    <button class="orange" onclick="sellPlayer()">
+      🟢 Sell Player
+    </button>
+
+    <button class="danger" onclick="unsoldPlayer()">
+      🔴 Unsold
+    </button>
+
+    <div id="auctionMessage" class="message"></div>
+
   </div>
-  <script>
-    function createTeam() {
-      const name = document.getElementById("team").value.trim();
-      document.getElementById("message").textContent =
-        name ? "Team created: " + name : "Please enter a team name.";
-    }
-  </script>
-</body>
-</html>
+
+</div>
+
+
+<!-- CURRENT TEAM -->
+<div class="card hidden" id="controlCard">
+
+  <h2>🎯 Your Team</h2>
+
+  <select id="selectedTeam" onchange="updateTeamDisplay()">
+  </select>
+
+  <p>
+    Team Purse:
+    <strong id="selectedPurse">₹100 Cr</strong>
+  </p>
+
+  <p>
+    Players Bought:
+    <strong id="selectedPlayers">0</strong>
+  </p>
+
+</div>
+
+
+<!-- AUCTION CONTROLS -->
+<div class="card hidden" id="nextCard">
+
+  <h2>🏏 Auction Controls</h2>
+
+  <button class="blue" onclick="nextPlayer()">
+    ➡️ Next Player
+  </button>
+
+  <button class="danger" onclick="resetAuction()">
+    🔄 Reset Auction
+  </button>
+
+</div>
+
+
+<!-- WELCOME -->
+<div class="card" id="welcomeCard">
+
+  <h2>Welcome to the Auction!</h2>
+
+  <p>
+    Build your dream ODI cricket team.
+  </p>
+
+  <p>
+    Create a team and start bidding on players.
+  </p>
+
+</div>
+
+
+<!-- PLAYER HISTORY -->
+<div class="card hidden" id="historyCard">
+
+  <h2>📋 Auction Results</h2>
+
+  <div id="history"></div>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* =========================
+   AUCTION DATA
+========================= */
+
+const players = [
+  {
+    name: "Virat Kohli",
+    role: "Batsman",
+    price: 2
+  },
+
+  {
+    name: "Rohit Sharma",
+    role: "Batsman",
+    price: 2
+  },
+
+  {
+    name: "Jasprit Bumrah",
+    role: "Bowler",
+    price: 2
+  },
+
+  {
+    name: "Hardik Pandya",
+    role: "All-Rounder",
+    price: 1.5
+  },
+
+  {
+    name: "Ravindra Jadeja",
+    role: "All-Rounder",
+    price: 1.5
+  },
+
+  {
+    name: "KL Rahul",
+    role: "Wicketkeeper",
+    price: 1
+  },
+
+  {
+    name: "Shubman Gill",
+    role: "Batsman",
+    price: 1
+  },
+
+  {
+    name: "Mohammed Siraj",
+    role: "Bowler",
+    price: 1
+  }
+];
+
+
+/* =========================
+   VARIABLES
+========================= */
+
+let teams = [];
+
+let currentPlayerIndex = 0;
+
+let currentBid = 0;
+
+let highestBidder = null;
+
+let auctionFinished = false;
+
+
+/* =========================
+   CREATE TEAM
+========================= */
+
+function createTeam() {
+
+  const input = document.getElementById("teamName");
+
+  const name = input.value.trim();
+
+  if (name === "") {
+
+    document.getElementById("teamMessage").innerText =
+      "Please enter a team name.";
+
+    return;
+  }
+
+  if (
+    teams.some(team =>
+      team.name.toLowerCase() === name.toLowerCase()
+    )
+  ) {
+
+    document.getElementById("teamMessage").innerText =
+      "Team already exists.";
+
+    return;
+  }
+
+  teams.push({
+    name: name,
+    purse: 100,
+    players: []
+  });
+
+  input.value = "";
+
+  document.getElementById("teamMessage").innerText =
+    "Team created: " + name;
+
+  updateTeamList();
+
+  updateTeamSelector();
+
+  document.getElementById("auctionCard")
+    .classList.remove("hidden");
+
+  document.getElementById("controlCard")
+    .classList.remove("hidden");
+
+  document.getElementById("nextCard")
+    .classList.remove("hidden");
+
+  document.getElementById("welcomeCard")
+    .classList.add("hidden");
+
+  loadPlayer();
+
+}
+
+
+/* =========================
+   UPDATE TEAM LIST
+========================= */
+
+function updateTeamList() {
+
+  const list =
+    document.getElementById("teamList");
+
+  list.innerHTML = "";
+
+  teams.forEach(team => {
+
+    const div =
+      document.createElement("div");
+
+    div.className = "team";
+
+    div.innerHTML = `
+      <div class="team-name">
+        ${team.name}
+      </div>
+
+      <div class="purse">
+        Purse: ₹${team.purse.toFixed(2)} Cr
+      </div>
+
+      <div>
+        Players: ${team.players.length}
+      </div>
+    `;
+
+    list.appendChild(div);
+
+  });
+}
+
+
+/* =========================
+   TEAM SELECTOR
+========================= */
+
+function updateTeamSelector() {
+
+  const select =
+    document.getElementById("selectedTeam");
+
+  select.innerHTML = "";
+
+  teams.forEach((team, index) => {
+
+    const option =
+      document.createElement("option");
+
+    option.value = index;
+
+    option.textContent = team.name;
+
+    select.appendChild(option);
+
+  });
+
+  updateTeamDisplay();
+}
+
+
+/* =========================
+   TEAM DISPLAY
+========================= */
+
+function updateTeamDisplay() {
+
+  const select =
+    document.getElementById("selectedTeam");
+
+  const index =
+    parseInt(select.value);
+
+  if (isNaN(index)) {
+    return;
+  }
+
+  const team = teams[index];
+
+  document.getElementById("selectedPurse")
+    .innerText =
+    "₹" + team.purse.toFixed(2) + " Cr";
+
+  document.getElementById("selectedPlayers")
+    .innerText =
+    team.players.length;
+
+}
+
+
+/* =========================
+   LOAD PLAYER
+========================= */
+
+function loadPlayer() {
+
+  if (
+    currentPlayerIndex >= players.length
+  ) {
+
+    auctionFinished = true;
+
+    document.getElementById("auctionCard")
+      .innerHTML = `
+        <div class="player">
+          <h2>🏆 Auction Completed!</h2>
+
+          <p>
+            All players have been auctioned.
+          </p>
+        </div>
+      `;
+
+    return;
+  }
+
+  auctionFinished = false;
+
+  const player =
+    players[currentPlayerIndex];
+
+  currentBid = player.price;
+
+  highestBidder = null;
+
+  document.getElementById("playerName")
+    .innerText = player.name;
+
+  document.getElementById("playerRole")
+    .innerText = player.role;
+
+  document.getElementById("basePrice")
+    .innerText = player.price;
+
+  document.getElementById("currentBid")
+    .innerText = player.price;
+
+  document.getElementById("highestBidder")
+    .innerText = "No team";
+
+  document.getElementById("auctionMessage")
+    .innerText =
+    "Bidding is open!";
+
+}
+
+
+/* =========================
+   PLACE BID
+========================= */
+
+function placeBid() {
+
+  if (auctionFinished) {
+    return;
+  }
+
+  if (teams.length === 0) {
+
+    alert("Create a team first.");
+
+    return;
+  }
+
+  const select =
+    document.getElementById("selectedTeam");
+
+  const teamIndex =
+    parseInt(select.value);
+
+  const team =
+    teams[teamIndex];
+
+  let nextBid;
+
+  if (currentBid < 1) {
+
+    nextBid =
+      currentBid + 0.1;
+
+  } else {
+
+    nextBid =
+      currentBid + 0.5;
+
+  }
+
+  nextBid =
+    Math.round(nextBid * 100) / 100;
+
+  if (team.purse < nextBid) {
+
+    document.getElementById("auctionMessage")
+      .innerText =
+      "Not enough purse for this bid.";
+
+    return;
+  }
+
+  currentBid = nextBid;
+
+  highestBidder = team;
+
+  document.getElementById("currentBid")
+    .innerText = currentBid;
+
+  document.getElementById("highestBidder")
+    .innerText = team.name;
+
+  document.getElementById("auctionMessage")
+    .innerText =
+    team.name + " bid ₹" +
+    currentBid +
+    " Cr";
+
+}
+
+
+/* =========================
+   SELL PLAYER
+========================= */
+
+function sellPlayer() {
+
+  if (highestBidder === null) {
+
+    document.getElementById("auctionMessage")
+      .innerText =
+      "No team has bid yet.";
+
+    return;
+  }
+
+  const team =
+    highestBidder;
+
+  const player =
+    players[currentPlayerIndex];
+
+  team.purse -= currentBid;
+
+  team.players.push({
+    name: player.name,
+    role: player.role,
+    price: currentBid
+  });
+
+  document.getElementById("auctionMessage")
+    .innerHTML =
+    `<span class="sold">
+      SOLD to ${team.name} for ₹${currentBid} Cr
+    </span>`;
+
+  addHistory(
+    player.name,
+    team.name,
+    currentBid,
+    "SOLD"
+  );
+
+  updateTeamList();
+
+  updateTeamDisplay();
+
+}
+
+
+/* =========================
+   UNSOLD PLAYER
+========================= */
+
+function unsoldPlayer() {
+
+  const player =
+    players[currentPlayerIndex];
+
+  document.getElementById("auctionMessage")
+    .innerHTML =
+    `<span class="unsold">
+      UNSOLD
+    </span>`;
+
+  addHistory(
+    player.name,
+    "-",
+    currentBid,
+    "UNSOLD"
+  );
+
